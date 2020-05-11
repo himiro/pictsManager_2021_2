@@ -1,0 +1,19 @@
+version: "3.7"
+services:
+  api:
+    container_name: picts-manager-api
+    build:
+      context: .
+    env_file: .env
+    ports:
+      - "9000:9000"
+  database:
+    container_name: picts-manager-database
+    image: mariadb:10.5
+    env_file: .env
+    ports:
+      - "3306:3306"
+    volumes:
+      - "picts-manager-database:/var/lib/mysql"
+volumes:
+  picts-manager-database:
