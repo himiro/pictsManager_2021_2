@@ -108,9 +108,10 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
+          PermissionHandler(Permission.photos);
           PermissionHandler(Permission.camera);
         },
-        tooltip: 'Increment',
+        tooltip: 'Add image',
         child: Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
