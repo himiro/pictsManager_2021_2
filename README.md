@@ -1,1 +1,0 @@
-# pictsManager_2021_2
