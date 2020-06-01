@@ -8,12 +8,15 @@ services:
     ports:
       - "9000:9000"
   database:
+    image: bitnami/couchdb:3
     container_name: picts-manager-database
-    image: mariadb:10.5
-    env_file: .env
+    environment:
+      - COUCHDB_PASSWORD=couchdb
     ports:
-      - "3306:3306"
+      - '5984:5984'
+      - '4369:4369'
+      - '9100:9100'
     volumes:
-      - "picts-manager-database:/var/lib/mysql"
+      - picts-manager-database:/bitnami/couchdb
 volumes:
   picts-manager-database:

@@ -8,15 +8,20 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const router = express.Router();
 const uploadsDir = path.resolve(`${__dirname}/../../uploads`);
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdir(uploadsDir, () => console.log(`Created uploads dir ${uploadsDir}`));
+
+const createDirectory = (directory) => {
+  let fullPath = path.join(uploadsDir, directory)
+  if (!fs.existsSync(fullPath)) {
+    fs.mkdir(fullPath, () => console.log(`Created directory ${directory}`));
+  }
 }
+createDirectory(uploadsDir)
 
 const uploadMiddleware = (req, res, next) => {
   console.log(req.file)
   const storage = multer.diskStorage({
       destination: function (req, file, cb) {
-        cb(null, uploadsDir)
+        cb(null, path.join(uploadsDir, res.locals.user.email))
       },
       filename: function (req, file, cb) {
         cb(null, Date.now() + '-' + file.originalname)
@@ -39,7 +44,7 @@ router.get('/', async (req, res) => {
   if (!fs.existsSync(uploadsDir)) {
     return res.status(200).send([]);
   }
-  let files = fs.readdirSync(uploadsDir)
+  let files = fs.readdirSync(path.join(uploadsDir, res.locals.user.email))
   return res.status(200).send(files);
 })
 
@@ -48,7 +53,7 @@ router.post('/', uploadMiddleware, async (req, res) => {
 })
 
 router.get('/:name', async (req, res) => {
-  const filePath = `${uploadsDir}/${req.params.name}`;
+  const filePath = `${uploadsDir}/${res.locals.user.email}/${req.params.name}`;
   if (!fs.existsSync(filePath)) {
     return res.status(404).send({ message: 'File not found' });
   }
@@ -57,7 +62,7 @@ router.get('/:name', async (req, res) => {
 
 router.delete('/:name', async (req, res) => {
   try {
-    const filePath = `${uploadsDir}/${req.params.name}`;
+    const filePath = `${uploadsDir}/${res.locals.user.email}/${req.params.name}`;
     if (!fs.existsSync(filePath)) {
       return res.status(404).send({ message: 'File not found' });
     }
@@ -70,3 +75,4 @@ router.delete('/:name', async (req, res) => {
 })
 
 export default router;
+export { createDirectory };
