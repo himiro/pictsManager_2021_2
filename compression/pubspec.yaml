@@ -1,0 +1,8 @@
+name: picts_manager_huffman_compression
+version: 1.0.0
+description: Huffman compression for the project picts_manager
+author: Mathilde Chabeau <mathilde.chabeau@epitech.eu>
+homepage: https://github.com/himiro/pictsManager_2021_2
+repository: https://github.com/himiro/pictsManager_2021_2.git
+environment:
+  sdk: '>=2.0.0 <3.0.0'

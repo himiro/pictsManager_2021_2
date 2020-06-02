@@ -1,0 +1,14 @@
+{
+  "configVersion": 2,
+  "packages": [
+    {
+      "name": "picts_manager_huffman_compression",
+      "rootUri": "../",
+      "packageUri": "lib/",
+      "languageVersion": "2.0"
+    }
+  ],
+  "generated": "2020-06-02T12:44:11.791279Z",
+  "generator": "pub",
+  "generatorVersion": "2.7.2"
+}
