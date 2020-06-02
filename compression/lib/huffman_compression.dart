@@ -1,8 +1,8 @@
-import "src/test.dart";
+import "src/huffman_compression.dart";
 
-export 'src/test.dart';
+export 'src/huffman_compression.dart';
 
-String getTestFunction()
+String compress()
 {
-  return sayTest();
+  return huffmanCompression();
 }
