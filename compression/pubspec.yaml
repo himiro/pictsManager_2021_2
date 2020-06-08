@@ -6,3 +6,5 @@ homepage: https://github.com/himiro/pictsManager_2021_2
 repository: https://github.com/himiro/pictsManager_2021_2.git
 environment:
   sdk: '>=2.0.0 <3.0.0'
+dependencies:
+  image: ^2.1.13
