@@ -9,13 +9,13 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const router = express.Router();
 const uploadsDir = path.resolve(`${__dirname}/../../uploads`);
 
-const createDirectory = (directory) => {
+const createDirectory = (directory='') => {
   let fullPath = path.join(uploadsDir, directory)
   if (!fs.existsSync(fullPath)) {
     fs.mkdir(fullPath, () => console.log(`Created directory ${directory}`));
   }
 }
-createDirectory(uploadsDir)
+createDirectory()
 
 const uploadMiddleware = (req, res, next) => {
   console.log(req.file)
