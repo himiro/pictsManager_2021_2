@@ -4,5 +4,7 @@ export 'src/huffman_compression.dart';
 
 String compress()
 {
-  return huffmanCompression();
+  HuffmanAlgorithm huffmanAlgorithm = new HuffmanAlgorithm();
+
+  return huffmanAlgorithm.huffmanCompression();
 }

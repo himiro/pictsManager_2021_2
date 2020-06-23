@@ -1,23 +1,44 @@
 class TreeNode
 {
-  Map value;
+  int color;
+  double probability;
+  String is_right;
+  String code;
   TreeNode left;
   TreeNode right;
+  int depth;
 
-  //Syntaxic sugar
-  TreeNode(String code, String color, double probability)
+  TreeNode(int color, double probability, int depth, Stringcode)
   {
-    this.value = new Map();
-    value['code'] = code;
-    value['color'] = color;
-    value['probability'] = probability;
+    this.color = color;
+    this.probability = probability;
+    this.is_right = '0';
+    this.left = null;
+    this.right = null;
+    this.depth = 0;
+    if (code == null)
+      this.code = this.is_right;
+    else
+      {
+        this.code = code;
+      }
+  }
 
+  void setRight(String is_right)
+  {
+    this.is_right = is_right;
+  }
+
+  void setCode(String code)
+  {
+    this.code = code + this.is_right;
   }
 
   void describeTreeNode()
   {
     print("TreeNode : ");
-    this.value.forEach((k,v) => print('${k}: ${v}'));
+    print(this.color);
+    print(this.probability);
     print("-----------");
   }
 }
