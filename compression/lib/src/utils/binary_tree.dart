@@ -4,8 +4,8 @@ class BinaryTree
 {
   TreeNode firstNode;
 
-  BinaryTree()
+  BinaryTree(int color, double proba)
   {
-    this.firstNode = new TreeNode("1", "black", 1.0);
+    this.firstNode = new TreeNode(color, proba, 0, null);
   }
 }
