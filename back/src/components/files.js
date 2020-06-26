@@ -57,6 +57,7 @@ router.get('/:name', async (req, res) => {
   if (!fs.existsSync(filePath)) {
     return res.status(404).send({ message: 'File not found' });
   }
+  res.header('Content-Type', 'image/png')
   return res.sendFile(filePath);
 })
 
