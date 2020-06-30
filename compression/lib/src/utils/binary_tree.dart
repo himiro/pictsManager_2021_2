@@ -3,9 +3,16 @@ import 'package:picts_manager_huffman_compression/src/utils/tree_node.dart';
 class BinaryTree
 {
   TreeNode firstNode;
+  double probability;
 
-  BinaryTree(int color, double proba)
+  BinaryTree(TreeNode left, TreeNode right)
   {
-    this.firstNode = new TreeNode(color, proba, 0, null);
+    probability = left.probability + right.probability;
+    this.firstNode = new TreeNode.node(left, right, probability);
+  }
+
+  TreeNode getFirstNode()
+  {
+    return (this.firstNode);
   }
 }

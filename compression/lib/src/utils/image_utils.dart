@@ -19,7 +19,7 @@ class ImageUtils
 
   void readImage()
   {
-    this.img = decodeJpg(File(this.imagePath).readAsBytesSync());
+    this.img = decodePng(File(this.imagePath).readAsBytesSync());
     this.setHeight(this.img.height);
     this.setWidth(this.img.width);
     this.setColorsProbabilities();
@@ -55,7 +55,7 @@ class ImageUtils
       }
     }
     this.colorsProbability.forEach((k,v) => this.colorsProbability.update(k, (dynamic v) => v/totalPixels*100));
-    this.colorsProbability = this.sortMapByValuesDesc();
+    this.colorsProbability = this.sortMapByValuesAsc();
     this.colorsProbability.forEach((k,v) => print('${k}: ${v}'));
   }
 
