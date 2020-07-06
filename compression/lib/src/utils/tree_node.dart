@@ -13,19 +13,29 @@ class TreeNode
     this.right = null;
   }
 
-  TreeNode.node(TreeNode left, TreeNode right, double probability)
+  TreeNode.node(TreeNode left, TreeNode right)
   {
     this.color = null;
-    this.probability = probability;
+    this.probability = left.probability + right.probability;
     this.left = left;
     this.right = right;
   }
 
-  void describeTreeNode()
+  void describeTreeNode(bool recursif, int count)
   {
-    print("TreeNode : ");
+    print("-----------");
+    print("TreeNode ${count} : ");
     print(this.color);
     print(this.probability);
+    if (recursif == true)
+      {
+        if (this.left != null) {
+          this.left.describeTreeNode(recursif, count+1);
+        }
+        if (this.right != null) {
+          this.right.describeTreeNode(recursif, count+1);
+        }
+      }
     print("-----------");
   }
 }

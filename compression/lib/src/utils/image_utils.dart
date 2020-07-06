@@ -1,7 +1,6 @@
 import 'dart:collection';
 import 'dart:io';
 import 'package:image/image.dart';
-import 'package:picts_manager_huffman_compression/src/utils/binary_tree.dart';
 import 'package:picts_manager_huffman_compression/src/utils/tree_node.dart';
 
 class ImageUtils
@@ -56,7 +55,18 @@ class ImageUtils
     }
     this.colorsProbability.forEach((k,v) => this.colorsProbability.update(k, (dynamic v) => v/totalPixels*100));
     this.colorsProbability = this.sortMapByValuesAsc();
-    this.colorsProbability.forEach((k,v) => print('${k}: ${v}'));
+  }
+
+  // RightNode = 1 and LeftNode = 0
+  String headerBinaryTree(TreeNode root, String header)
+  {
+    if (root.left != null) {
+        header = this.headerBinaryTree(root.left, header + '0');
+      }
+      if (root.right != null) {
+        header = this.headerBinaryTree(root.right, header + '1');
+      }
+      return header;
   }
 
   List encodeImage(Map colorsBinaryCode)
@@ -72,6 +82,29 @@ class ImageUtils
     }
     Image resultImage = new Image.fromBytes(this.height, this.width, encodedImage);
     return encodePng(resultImage);
+  }
+
+  Map sortMapByKeysAsc()
+  {
+    var sortedEntries = this.colorsProbability.entries.toList()..sort((e1, e2) {
+      var diff = e1.key.compareTo(e2.key);
+      if (diff == 0) diff = e1.value.compareTo(e2.value);
+      return diff;
+    });
+
+    return (Map.fromEntries(sortedEntries));
+  }
+
+
+  Map sortMapByKeysDesc()
+  {
+    var sortedEntries = this.colorsProbability.entries.toList()..sort((e1, e2) {
+      var diff = e2.key.compareTo(e1.key);
+      if (diff == 0) diff = e2.value.compareTo(e1.value);
+      return diff;
+    });
+
+    return (Map.fromEntries(sortedEntries));
   }
 
   Map sortMapByValuesAsc()
