@@ -8,7 +8,17 @@ import router from './components/index.js';
 
 const main = async () => {
   try {
-    await db.initDatabase();
+
+    let dbConnected = false;
+    while (!dbConnected) {
+      await new Promise((resolve, _) => setTimeout(resolve, 1000));
+      try {
+        await db.initDatabase();
+        dbConnected = true;
+      } catch (err) {
+        console.log('Database not ready, retrying in 1 sec', err)
+      }
+    }
 
     const server = express();
     server.use(morgan('tiny'));

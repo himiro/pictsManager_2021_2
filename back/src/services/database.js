@@ -1,10 +1,10 @@
 import Nano from 'nano';
 import config from '../config/index.js';
-
+console.log('config', config)
 let database = {};
 
 const initDatabase = async () => {
-  const nano = Nano(`http://${config.dbUser}:${config.dbPassword}@localhost:5984`);
+  const nano = Nano(`http://${config.dbUser}:${config.dbPassword}@${config.dbHost}:5984`);
   database = nano.use('picts-manager');
 
   try {

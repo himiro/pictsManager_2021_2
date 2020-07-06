@@ -7,6 +7,8 @@ services:
     env_file: .env
     ports:
       - "9000:9000"
+    volumes:
+      - ./uploads:/app/uploads
   database:
     image: bitnami/couchdb:3
     container_name: picts-manager-database
@@ -18,5 +20,6 @@ services:
       - '9100:9100'
     volumes:
       - picts-manager-database:/bitnami/couchdb
+
 volumes:
   picts-manager-database:
