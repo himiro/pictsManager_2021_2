@@ -46,11 +46,10 @@ router.get('/', async (req, res) => {
     return res.status(200).send([]);
   }
   let files = await db.find({ type: 'file', userId: res.locals.user.email });
-  console.log(files);
   if (req.query.search) {
     files = files.filter((f) => (f.tags.indexOf(req.query.search) > -1))
   }
-  return res.status(200).send(files.map(f => f.name));
+  return res.status(200).send(files.map(f => (`${f.shared ? 'shared/' : ''}${f.name}`)));
 })
 
 router.post('/', uploadMiddleware, async (req, res) => {
@@ -60,27 +59,28 @@ router.post('/', uploadMiddleware, async (req, res) => {
     tags: [],
     createdAt: new Date(),
     userId: res.locals.user.email,
+    shared: false,
   })
   return res.status(200).send(req.file);
 })
 
-// router.get('/share', async (req, res) => {
-//   const folder = `${uploadsDir}/${res.locals.user.email}`;
-//   if (!fs.existsSync(folder)) {
-//     return res.status(200).send([]);
-//   }
-//   let files = fs.readdirSync(path.join(folder))
-//   return res.status(200).send(files);
-// })
-//
-// router.get('/share/:name', async(req, res) => {
-//   const filePath = `${uploadsDir}/${res.locals.user.email}/shared/${req.params.name}`;
-//   if (!fs.existsSync(filePath)) {
-//     return res.status(404).send({ message: 'File not found' });
-//   }
-//   res.header('Content-Type', 'image/png')
-//   return res.sendFile(filePath);
-// })
+router.get('/share', async (req, res) => {
+  const folder = `${uploadsDir}/${res.locals.user.email}/shared`;
+  if (!fs.existsSync(folder)) {
+    return res.status(200).send([]);
+  }
+  let files = fs.readdirSync(path.join(folder))
+  return res.status(200).send(files);
+})
+
+router.get('/share/:name', async(req, res) => {
+  const filePath = `${uploadsDir}/${res.locals.user.email}/shared/${req.params.name}`;
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).send({ message: 'File not found' });
+  }
+  res.header('Content-Type', 'image/png')
+  return res.sendFile(filePath);
+})
 
 router.post('/share', async (req, res) => {
   try{
@@ -93,10 +93,11 @@ router.post('/share', async (req, res) => {
     const img = req.body.img_name
     const email = req.body.email;
     const imgPath = `${uploadsDir}/${res.locals.user.email}/${req.body.img_name}`;
-    const emailPath = path.resolve(`${uploadsDir}/${email}/`);
+    const emailPath = path.resolve(`${uploadsDir}/${email}/shared/`);
     if(!fs.existsSync(imgPath)) {
       return res.status(404).send({ message: 'Image: File not found' });
     }
+
     const files = await db.find({ type: 'file', userId: res.locals.email, name: req.params.name });
     if (files.length < 1) return res.status(404).send({ message: 'File does not exists' });
     const file = files[0];
@@ -111,6 +112,7 @@ router.post('/share', async (req, res) => {
       tags: file.tags,
       createdAt: new Date(),
       userId: req.body.email,
+      shared: true,
     })
 
     return res.status(200).send({message: "Successfully shared file"})
@@ -121,11 +123,10 @@ router.post('/share', async (req, res) => {
 
 router.delete('/share/:name', async(req, res) => {
   try {
-    const filePath = `${uploadsDir}/${res.locals.user.email}/${req.params.name}`;
+    const filePath = `${uploadsDir}/${res.locals.user.email}/shared/${req.params.name}`;
     if (!fs.existsSync(filePath)) {
       return res.status(404).send({ message: 'File not found' });
     }
-    console.log(filePath)
     await fs.unlink(filePath, () => console.log(`Deleted ${filePath}`));
     return res.status(200).send({message: "Successfully deleted file"})
   } catch (err) {

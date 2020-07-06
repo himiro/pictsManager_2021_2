@@ -17,4 +17,6 @@ RUN flutter precache
 
 RUN cd $ANDROID_HOME/tools/bin && sudo ./*sdkmanager "system-images;android-27;google_apis_playstore;x86" && sudo ./sdkmanager --licenses
 
-RUN flutter emulators
+RUN pwd
+
+ENTRYPOINT flutter build apk --split-per-abi
