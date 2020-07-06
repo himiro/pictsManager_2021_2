@@ -127,7 +127,7 @@ router.delete('/:name', async (req, res) => {
       return res.status(404).send({ message: 'File not found' });
     }
     await fs.unlink(filePath);
-    return res.status(200).send({message: "Successfully deleted file"}
+    return res.status(200).send({message: "Successfully deleted file"})
   } catch (err) {
     console.error(`Error deleting file ${req.params.name}`, err);
     return res.status(500).send({ message: `Error deleting file ${req.params.name}`});
