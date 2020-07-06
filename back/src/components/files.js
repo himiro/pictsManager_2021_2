@@ -45,11 +45,55 @@ router.get('/', async (req, res) => {
     return res.status(200).send([]);
   }
   let files = fs.readdirSync(path.join(uploadsDir, res.locals.user.email))
+  if(files.includes('shared')) files.splice(files.indexOf('shared'), 1);
   return res.status(200).send(files);
 })
 
 router.post('/', uploadMiddleware, async (req, res) => {
   return res.status(200).send(req.file);
+})
+
+router.get('/share', async (req, res) => {
+  const sharedFolder = `${uploadsDir}/${res.locals.user.email}/shared`;
+  if (!fs.existsSync(sharedFolder)) {
+    return res.status(200).send([]);
+  }
+  let files = fs.readdirSync(path.join(sharedFolder))
+  return res.status(200).send(files);
+})
+
+router.get('/share/:name', async(req, res) => {
+  const filePath = `${uploadsDir}/${res.locals.user.email}/shared/${req.params.name}`;
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).send({ message: 'File not found' });
+  }
+  res.header('Content-Type', 'image/png')
+  return res.sendFile(filePath);
+})
+
+router.post('/share', async (req, res) => {
+  try{
+    if (!req.body.img_name || typeof(req.body.img_name) !== 'string' || req.body.img_name.length <= 0) {
+      return res.status(400).send({ message: 'Missing image name' });
+    }
+    if (!req.body.email || typeof(req.body.email) !== 'string' || req.body.email.length <= 0) {
+      return res.status(400).send({ message: 'Missing email of the receiver' });
+    }
+    const img = req.body.img_name
+    const email = req.body.email;
+    const imgPath = `${uploadsDir}/${res.locals.user.email}/${req.body.img_name}`;
+    const emailPath = path.resolve(`${uploadsDir}/${email}/shared/`);
+    if(!fs.existsSync(imgPath)) {
+      return res.status(404).send({ message: 'Image: File not found' });
+    }
+    if(!fs.existsSync(emailPath)) {
+      fs.mkdir(emailPath, () => console.log(`Created directory ${emailPath}`));
+    }
+    fs.createReadStream(imgPath).pipe(fs.createWriteStream(emailPath + "/" + img));
+    return res.status(200).send({message: "Successfully shared file"})
+  }catch(err){
+    return res.status(500).send({message: err})
+  }
 })
 
 router.get('/:name', async (req, res) => {
