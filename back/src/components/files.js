@@ -96,6 +96,21 @@ router.post('/share', async (req, res) => {
   }
 })
 
+router.delete('/share/:name', async(req, res) => {
+  try {
+    const filePath = `${uploadsDir}/${res.locals.user.email}/shared/${req.params.name}`;
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).send({ message: 'File not found' });
+    }
+    console.log(filePath)
+    await fs.unlink(filePath, () => console.log(`Deleted ${filePath}`));
+    return res.status(200).send({message: "Successfully deleted file"})
+  } catch (err) {
+    console.error(`Error deleting file ${req.params.name}`, err);
+    return res.status(500).send({ message: `Error deleting file ${req.params.name}`});
+  }
+})
+
 router.get('/:name', async (req, res) => {
   const filePath = `${uploadsDir}/${res.locals.user.email}/${req.params.name}`;
   if (!fs.existsSync(filePath)) {
@@ -112,10 +127,10 @@ router.delete('/:name', async (req, res) => {
       return res.status(404).send({ message: 'File not found' });
     }
     await fs.unlink(filePath);
-    return res.sendFile(filePath);
+    return res.status(200).send({message: "Successfully deleted file"}
   } catch (err) {
     console.error(`Error deleting file ${req.params.name}`, err);
-    return rs.status(500).send({ message: `Error deleting file ${req.params.name}`});
+    return res.status(500).send({ message: `Error deleting file ${req.params.name}`});
   }
 })
 
