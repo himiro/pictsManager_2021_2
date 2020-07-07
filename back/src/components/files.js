@@ -45,11 +45,11 @@ router.get('/', async (req, res) => {
   if (!fs.existsSync(uploadsDir)) {
     return res.status(200).send([]);
   }
-  let files = await db.find({ type: 'file', userId: res.locals.user.email });
+  let files = await db.find({ type: 'file', userId: res.locals.user.email, shared: false });
   if (req.query.search) {
     files = files.filter((f) => (f.tags.indexOf(req.query.search) > -1))
   }
-  return res.status(200).send(files.map(f => (`${f.shared ? 'shared/' : ''}${f.name}`)));
+  return res.status(200).send(files.map(f => (f.name)));
 })
 
 router.post('/', uploadMiddleware, async (req, res) => {
