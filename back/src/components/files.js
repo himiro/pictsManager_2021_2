@@ -52,6 +52,20 @@ router.get('/', async (req, res) => {
   return res.status(200).send(files.map(f => (f.name)));
 })
 
+router.get('/tags', async (req, res) => {
+  let files = await db.find({ type: 'file', userId: res.locals.user.email, shared: false });
+  let tags = [];
+  files.map((f) => {
+    f.tags.map(tag => {
+      if (tags.indexOf(tag) < 0) {
+        tags.push(tag);
+      }
+    })
+  })
+  tags = tags.sort((a, b) => (a.localeCompare(b)));
+  return res.status(200).send(tags);
+})
+
 router.post('/', uploadMiddleware, async (req, res) => {
   await db.insert({
     type: 'file',
