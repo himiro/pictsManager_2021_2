@@ -2,6 +2,7 @@ class TreeNode
 {
   int color;
   double probability;
+  String encoding;
   TreeNode left;
   TreeNode right;
 
@@ -11,6 +12,7 @@ class TreeNode
     this.probability = probability;
     this.left = null;
     this.right = null;
+    this.encoding = "";
   }
 
   TreeNode.node(TreeNode left, TreeNode right)
@@ -19,6 +21,12 @@ class TreeNode
     this.probability = left.probability + right.probability;
     this.left = left;
     this.right = right;
+    this.encoding = "";
+  }
+
+  void setEncoding(String encoding)
+  {
+    this.encoding = encoding;
   }
 
   void describeTreeNode(bool recursif, int count)

@@ -6,6 +6,7 @@ import 'package:picts_manager_huffman_compression/src/utils/tree_node.dart';
 class ImageUtils
 {
   Map colorsProbability;
+  Map encodingTable;
   final String imagePath;
   Image img;
   int width;
@@ -14,14 +15,28 @@ class ImageUtils
   ImageUtils(this.imagePath)
   {
     this.colorsProbability = new HashMap();
+    this.encodingTable = new HashMap();
   }
 
-  void readImage()
+  bool readImage()
   {
-    this.img = decodePng(File(this.imagePath).readAsBytesSync());
+    String extension = this.imagePath.substring(this.imagePath.length - 3);
+    if (extension == 'png')
+      {
+        this.img = decodePng(File(this.imagePath).readAsBytesSync());
+      }
+    else if (extension == 'jpg')
+      {
+        this.img = decodeJpg(File(this.imagePath).readAsBytesSync());
+      }
+    else
+      {
+        return false;
+      }
     this.setHeight(this.img.height);
     this.setWidth(this.img.width);
     this.setColorsProbabilities();
+    return true;
   }
 
   void setHeight(int height)
@@ -54,39 +69,38 @@ class ImageUtils
       }
     }
     this.colorsProbability.forEach((k,v) => this.colorsProbability.update(k, (dynamic v) => v/totalPixels*100));
-    this.colorsProbability = this.sortMapByValuesAsc();
+    this.colorsProbability = this.sortMapByValuesAsc(this.colorsProbability);
   }
 
-  // RightNode = 1 and LeftNode = 0
-  String headerBinaryTree(TreeNode root, String header)
+  List encodeImage(TreeNode root, String destFile)
   {
-    if (root.left != null) {
-        header = this.headerBinaryTree(root.left, header + '0');
-      }
-      if (root.right != null) {
-        header = this.headerBinaryTree(root.right, header + '1');
-      }
-      return header;
-  }
-
-  List encodeImage(Map colorsBinaryCode)
-  {
-    List encodedImage = new List();
+    var destImage = new File(destFile);
+    print("COMPRESSING IMAGE. PLEASE WAIT IT CAN TAKE FEW MINUTES");
+    this.encodingTable = this.sortMapByKeysAsc(this.encodingTable);
+    destImage.writeAsStringSync(this.generateHeaderTree());
+    print("WRITING IMAGE. PLEASE WAIT");
     for (int y = 0; y < this.height; y++)
     {
       for (int x = 0; x < this.width; x++)
       {
         int pixelColor = this.img.getPixel(x, y);
-        encodedImage.add(colorsBinaryCode[pixelColor]);
+        destImage.writeAsStringSync(this.encodingTable[pixelColor], mode: FileMode.append);
       }
     }
-    Image resultImage = new Image.fromBytes(this.height, this.width, encodedImage);
-    return encodePng(resultImage);
   }
 
-  Map sortMapByKeysAsc()
+  String generateHeaderTree()
   {
-    var sortedEntries = this.colorsProbability.entries.toList()..sort((e1, e2) {
+    String res = "";
+    this.encodingTable.forEach((k, v) {
+      res = res + v;
+    });
+    return res;
+  }
+
+  Map sortMapByKeysAsc(Map map)
+  {
+    var sortedEntries = map.entries.toList()..sort((e1, e2) {
       var diff = e1.key.compareTo(e2.key);
       if (diff == 0) diff = e1.value.compareTo(e2.value);
       return diff;
@@ -96,9 +110,9 @@ class ImageUtils
   }
 
 
-  Map sortMapByKeysDesc()
+  Map sortMapByKeysDesc(Map map)
   {
-    var sortedEntries = this.colorsProbability.entries.toList()..sort((e1, e2) {
+    var sortedEntries = map.entries.toList()..sort((e1, e2) {
       var diff = e2.key.compareTo(e1.key);
       if (diff == 0) diff = e2.value.compareTo(e1.value);
       return diff;
@@ -107,9 +121,9 @@ class ImageUtils
     return (Map.fromEntries(sortedEntries));
   }
 
-  Map sortMapByValuesAsc()
+  Map sortMapByValuesAsc(Map map)
   {
-    var sortedEntries = this.colorsProbability.entries.toList()..sort((e1, e2) {
+    var sortedEntries = map.entries.toList()..sort((e1, e2) {
       var diff = e1.value.compareTo(e2.value);
       if (diff == 0) diff = e1.key.compareTo(e2.key);
       return diff;
@@ -118,9 +132,9 @@ class ImageUtils
     return (Map.fromEntries(sortedEntries));
   }
 
-  Map sortMapByValuesDesc()
+  Map sortMapByValuesDesc(Map map)
   {
-    var sortedEntries = this.colorsProbability.entries.toList()..sort((e1, e2) {
+    var sortedEntries = map.entries.toList()..sort((e1, e2) {
       var diff = e2.value.compareTo(e1.value);
       if (diff == 0) diff = e2.key.compareTo(e1.key);
       return diff;
@@ -138,64 +152,4 @@ class ImageUtils
   {
     return (this.colorsProbability);
   }
-
-  /*void createColorsBinaryTreeEquivalent(BinaryTree tree)
-  {
-    var colors = this.colorsProbability.keys.toList();
-    var probas = this.colorsProbability.values.toList();
-    if (tree == null) {
-      tree = new BinaryTree(colors[0], probas[0]);
-    }
-    print("FIRST NODE : ${tree.firstNode}");
-    print("FIRST NODE : ${tree.firstNode.color}");
-    print("FIRST NODE : ${tree.firstNode.code}");
-    TreeNode tmp = this.addTreeNode(colors, probas, tree.firstNode, 0, tree.firstNode.depth, tree.firstNode.code);
-    tree.firstNode = tmp;
-    this.inOrder(tree.firstNode);
-  }
-
-  void inOrder(TreeNode root)
-  {
-    if (root != null) {
-      inOrder(root.left);
-      int color = root.color;
-      double probability = root.probability;
-      String is_right = root.is_right;
-      String code = root.code;
-      print("$color : $probability : $is_right : $code");
-      inOrder(root.right);
-    }
-  }
-
-  TreeNode addTreeNode(List colors, List probas, TreeNode rootNode, int i, int depth, String code)
-  {
-    print("ADD NODE");
-    if (i < colors.length)
-    {
-      //MCMC VERIFIER ROOT NODE BORDELDE CUL
-      int color = colors[i];
-      double proba = probas[i];
-      TreeNode temp = new TreeNode(color, proba, depth+1, code);
-      code = code + rootNode.is_right;
-      rootNode = temp;
-
-      // insert left child
-      print("LEFT");
-      rootNode.left = addTreeNode(colors, probas, rootNode.left,
-          2 * i + 1, depth+1, code);
-      if (rootNode.left != null) {
-        rootNode.left.setRight(rootNode.is_right);
-        rootNode.left.setCode(code);
-      }
-      print("RIGHT");
-      // insert right child
-      rootNode.right = addTreeNode(colors, probas, rootNode.right,
-          2 * i + 2, depth+1, code);
-      if (rootNode.right != null) {
-        rootNode.right.setRight(rootNode.is_right);
-        rootNode.right.setCode(code);
-      }
-    }
-    return rootNode;
-  }*/
 }
