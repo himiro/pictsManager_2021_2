@@ -72,7 +72,7 @@ class ImageUtils
     this.colorsProbability = this.sortMapByValuesAsc(this.colorsProbability);
   }
 
-  List encodeImage(TreeNode root, String destFile)
+  void encodeImage(TreeNode root, String destFile)
   {
     var destImage = new File(destFile);
     print("COMPRESSING IMAGE. PLEASE WAIT IT CAN TAKE FEW MINUTES");
