@@ -127,6 +127,10 @@ router.delete('/share/:name', async(req, res) => {
     if (!fs.existsSync(filePath)) {
       return res.status(404).send({ message: 'File not found' });
     }
+    const files = await db.find({ type: 'file', userId: res.locals.email, name: req.params.name });
+    if (files.length < 1) return res.status(404).send({ message: 'File does not exists' });
+    await db.destroy({ _id: files[0]._id, _rev: files[0]._rev });
+
     await fs.unlink(filePath, () => console.log(`Deleted ${filePath}`));
     return res.status(200).send({message: "Successfully deleted file"})
   } catch (err) {
